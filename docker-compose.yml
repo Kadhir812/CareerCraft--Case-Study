@@ -1,5 +1,6 @@
 services:
   backend:
+    image: ${DOCKERHUB_USERNAME:-careercrafter}/${DOCKERHUB_BACKEND_REPOSITORY:-careercrafter-backend}:latest
     build:
       context: ./backend_careercrafter
       dockerfile: Dockerfile
@@ -13,6 +14,7 @@ services:
       - career-network
 
   frontend:
+    image: ${DOCKERHUB_USERNAME:-careercrafter}/${DOCKERHUB_FRONTEND_REPOSITORY:-careercrafter-frontend}:latest
     build:
       context: ./frontend_careercrafter
       dockerfile: Dockerfile

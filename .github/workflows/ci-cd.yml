@@ -150,12 +150,14 @@ jobs:
         uses: appleboy/ssh-action@v1.0.3
         env:
           DOCKERHUB_USERNAME: ${{ env.DOCKERHUB_USERNAME }}
+          DOCKERHUB_BACKEND_REPOSITORY: ${{ env.DOCKERHUB_BACKEND_REPOSITORY }}
+          DOCKERHUB_FRONTEND_REPOSITORY: ${{ env.DOCKERHUB_FRONTEND_REPOSITORY }}
           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
         with:
           host: ${{ env.EC2_HOST }}
           username: ${{ env.EC2_USER }}
           key: ${{ env.EC2_SSH_KEY }}
-          envs: DOCKERHUB_USERNAME,DOCKERHUB_TOKEN
+          envs: DOCKERHUB_USERNAME,DOCKERHUB_BACKEND_REPOSITORY,DOCKERHUB_FRONTEND_REPOSITORY,DOCKERHUB_TOKEN
           script_stop: true
           script: |
             set -e
@@ -163,6 +165,6 @@ jobs:
             echo "$DOCKERHUB_TOKEN" | docker login --username "$DOCKERHUB_USERNAME" --password-stdin
 
             cd ~/Backend
-            docker compose down --rmi all --remove-orphans || true
-            docker compose pull
-            docker compose up -d --remove-orphans
+            sudo -n docker compose down --remove-orphans || true
+            sudo -n docker compose pull
+            sudo -n docker compose up -d --remove-orphans
