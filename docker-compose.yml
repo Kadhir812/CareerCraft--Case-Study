@@ -1,0 +1,30 @@
+services:
+  backend:
+    build:
+      context: ./backend_careercrafter
+      dockerfile: Dockerfile
+    container_name: careercrafter-backend
+    env_file:
+      - ./backend_careercrafter/.env
+    expose:
+      - "8084"
+    restart: unless-stopped
+    networks:
+      - career-network
+
+  frontend:
+    build:
+      context: ./frontend_careercrafter
+      dockerfile: Dockerfile
+    container_name: careercrafter-frontend
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+    restart: unless-stopped
+    networks:
+      - career-network
+
+networks:
+  career-network:
+    driver: bridge

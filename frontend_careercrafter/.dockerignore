@@ -1,0 +1,7 @@
+backend_careercrafter/
+.git/
+.github/
+node_modules/
+dist/
+target/
+.DS_Store
