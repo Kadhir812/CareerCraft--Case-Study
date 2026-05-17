@@ -41,7 +41,8 @@ export function ProfileProvider({ children }) {
     }
   }
 
-  const role = profile?.role ? profile.role.toLowerCase() : localStorage.getItem('role')?.toLowerCase() || 'job_seeker'
+  const rawRole = profile?.role || localStorage.getItem('role') || 'JOB_SEEKER'
+  const role = rawRole.toLowerCase().replace('job_', '')
   const email = profile?.email || localStorage.getItem('email') || ''
 
   return (

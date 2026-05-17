@@ -96,7 +96,7 @@ jobs:
           AWS_REGION: ap-south-1
           S3_BUCKET: ci-test-bucket
         run: |
-          bash ./mvnw -B sonar:sonar \
+          bash ./mvnw -B org.sonarsource.scanner.maven:sonar-maven-plugin:4.0.0.4121:sonar \
             -Dsonar.host.url=${SONAR_HOST_URL} \
             -Dsonar.token=${SONAR_TOKEN} \
             -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY }} \

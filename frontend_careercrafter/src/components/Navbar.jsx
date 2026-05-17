@@ -4,9 +4,13 @@ import NotificationDropdown from './NotificationDropdown'
 import { useProfile } from '../contexts/ProfileContext'
 import './NavBar.css'
 
-export default function Navbar() {
+export default function Navbar({ role: roleProp }) {
   const { role: contextRole } = useProfile()
-  const role = contextRole === 'employer' ? 'employer' : 'seeker'
+  const normalizedRole = (roleProp || contextRole || '')
+    .toString()
+    .toLowerCase()
+    .replace('job_', '')
+  const role = normalizedRole === 'employer' ? 'employer' : 'seeker'
   const navigate = useNavigate()
   const location = useLocation()
 
