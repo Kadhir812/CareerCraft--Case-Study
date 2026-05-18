@@ -36,14 +36,14 @@ const initialEduForm = {
   description: ''
 }
 
-const JobSeekerProfile = () => {
+  const JobSeekerProfile = () => {
   const { profile: contextProfile, role: contextRole, reload } = useProfile()
 
-  const initialRole = contextRole === 'employer' ? 'employer' : 'seeker'
+  const currentRole = contextRole === 'employer' ? 'employer' : 'seeker'
 
   const [profile, setProfile] = useState({
     id: null,
-    role: initialRole,
+    role: currentRole,
     name: '',
     email: contextProfile?.email || localStorage.getItem('email') || '',
     phone: '',
@@ -81,7 +81,7 @@ const JobSeekerProfile = () => {
   const resumeInputRef = useRef(null)
 
   const loadSeekerProfile = async () => {
-    if (initialRole !== 'seeker' || !contextProfile) return
+    if (currentRole !== 'seeker' || !contextProfile) return
 
     setProfile(prev => ({
       ...prev,
@@ -96,7 +96,7 @@ const JobSeekerProfile = () => {
 
   useEffect(() => {
     loadSeekerProfile()
-  }, [contextProfile])
+  }, [contextProfile, currentRole])
 
   const loadResumeData = async () => {
     try {

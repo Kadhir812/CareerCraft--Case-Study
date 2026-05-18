@@ -107,7 +107,7 @@ export default function JobSeekerDashboard() {
             <p>Here's a summary of your job search activity.</p>
             {loadError && <small style={{ color: '#b42318' }}>{loadError}</small>}
           </div>
-          <Link to="/jobs">
+          <Link to="/jobs?from=seeker">
             <Button size="md">Browse Jobs</Button>
           </Link>
         </div>
