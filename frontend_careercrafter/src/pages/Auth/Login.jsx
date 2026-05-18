@@ -6,8 +6,44 @@ import ParticleBackground from '../../components/ParticleBackground'
 import { loginApi } from '../../api/authApi'
 import './AuthPage.css'
 
-const validateEmail = email =>
+const ALLOWED_ROLES = ['EMPLOYER', 'SEEKER']
+
+const validateEmail = (email) =>
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+
+const sanitizeToken = (token) => {
+  if (typeof token !== 'string') {
+    return null
+  }
+
+  const normalizedToken = token.trim()
+
+  return normalizedToken.length > 0
+    ? normalizedToken
+    : null
+}
+
+const sanitizeRole = (role) => {
+  if (typeof role !== 'string') {
+    return null
+  }
+
+  return ALLOWED_ROLES.includes(role)
+    ? role
+    : null
+}
+
+const sanitizeEmail = (email) => {
+  if (typeof email !== 'string') {
+    return null
+  }
+
+  const normalizedEmail = email.trim()
+
+  return validateEmail(normalizedEmail)
+    ? normalizedEmail
+    : null
+}
 
 const Login = () => {
   const navigate = useNavigate()
@@ -22,8 +58,15 @@ const Login = () => {
   const handleChange = (e) => {
     const { name, value } = e.target
 
-    setForm(f => ({ ...f, [name]: value }))
-    setErrors(err => ({ ...err, [name]: '' }))
+    setForm((f) => ({
+      ...f,
+      [name]: value
+    }))
+
+    setErrors((err) => ({
+      ...err,
+      [name]: ''
+    }))
   }
 
   const validate = () => {
@@ -55,19 +98,29 @@ const Login = () => {
     try {
       const { data } = await loginApi(form)
 
-      localStorage.setItem('token', data.token)
-      localStorage.setItem('role', data.role)
-      localStorage.setItem('email', data.email)
+      const token = sanitizeToken(data?.token)
+      const role = sanitizeRole(data?.role)
+      const email = sanitizeEmail(data?.email)
+
+      if (!token || !role || !email) {
+        throw new Error('Invalid server response')
+      }
+
+      localStorage.setItem('token', token)
+      localStorage.setItem('role', role)
+      localStorage.setItem('email', email)
 
       navigate(
-        data.role === 'EMPLOYER'
+        role === 'EMPLOYER'
           ? '/dashboard/employer'
           : '/dashboard/seeker'
       )
     } catch (err) {
       setErrors({
         password:
-          err?.response?.data?.message || 'Invalid credentials'
+          err?.response?.data?.message ||
+          err?.message ||
+          'Invalid credentials'
       })
     }
   }
