@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import './Button.css'
 
 export default function Button({
@@ -20,4 +21,14 @@ export default function Button({
       {children}
     </button>
   )
+}
+
+Button.propTypes = {
+  children: PropTypes.node.isRequired,
+  type: PropTypes.string,
+  variant: PropTypes.string,
+  size: PropTypes.string,
+  fullWidth: PropTypes.bool,
+  disabled: PropTypes.bool,
+  onClick: PropTypes.func,
 }
