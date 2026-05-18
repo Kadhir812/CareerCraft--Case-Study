@@ -4,7 +4,7 @@ import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
 import Button from '../../components/Button'
 import { createJobApi, getMyJobsApi, updateJobApi } from '../../api/jobsApi'
-// import { getApplicationsForJob } from '../../api/applicationApi'
+import { getApplicationsForJob } from '../../api/applicationApi'
 import './Dashboard.css'
 import JobPost from '../job/JobPost'
 
@@ -13,7 +13,7 @@ export default function EmployerDashboard() {
   const [editingJob, setEditingJob] = useState(null)
   const [jobs, setJobs] = useState([])
   const [loading, setLoading] = useState(true)
-  // const [recentApplicants, setRecentApplicants] = useState([])
+  const [recentApplicants, setRecentApplicants] = useState([])
   const [actionBusy, setActionBusy] = useState(false)
   const [error, setError] = useState('')
 
@@ -34,30 +34,30 @@ export default function EmployerDashboard() {
     loadJobs()
   }, [])
 
-//   // useEffect(() => {
-//   // async function loadApplicants() {
-//   //   try {
-//   //     if (jobs.length === 0) return
+  useEffect(() => {
+  async function loadApplicants() {
+    try {
+      if (jobs.length === 0) return
 
     
-//   //     const allApps = await Promise.all(
-//   //       jobs.map(job => getApplicationsForJob(job.id))
-//   //     )
+      const allApps = await Promise.all(
+        jobs.map(job => getApplicationsForJob(job.id))
+      )
 
-//   //     // flatten array
-//   //     const merged = allApps.flatMap(res => res.data)
+      // flatten array
+      const merged = allApps.flatMap(res => res.data)
 
-//   //     // sort latest first
-//   //     merged.sort((a, b) => new Date(b.appliedDate) - new Date(a.appliedDate))
+      // sort latest first
+      merged.sort((a, b) => new Date(b.appliedDate) - new Date(a.appliedDate))
 
-//   //     setRecentApplicants(merged)
-//   //   } catch (err) {
-//   //     console.error('Failed to load applicants', err)
-//   //   }
-//   // }
+      setRecentApplicants(merged)
+    } catch (err) {
+      console.error('Failed to load applicants', err)
+    }
+  }
 
-//   loadApplicants()
-// }, [jobs])
+  loadApplicants()
+}, [jobs])
 
   const employerJobs = useMemo(() => jobs, [jobs])
   async function handleSaveJob(jobData) {
@@ -108,7 +108,7 @@ export default function EmployerDashboard() {
           {[
             { label: 'Active Postings', value: employerJobs.filter(j => j.status === 'ACTIVE').length },
             { label: 'Total Applicants', value: employerJobs.reduce((s, j) => s + (j.applicants || 0), 0),},
-            // { label: 'Shortlisted', value: recentApplicants.filter(a => a.status === 'SHORTLISTED').length},
+            { label: 'Shortlisted', value: recentApplicants.filter(a => a.status === 'SHORTLISTED').length},
             { label: 'Closed Jobs', value: employerJobs.filter(j => j.status === 'CLOSED').length},
           ].map(s => (
             <div key={s.label} className="stat-card">
@@ -168,7 +168,7 @@ export default function EmployerDashboard() {
                 </tr>
               </thead>
               <tbody>
-               {/* {recentApplicants.map(app => (
+                {recentApplicants.map(app => (
                  <tr key={app.id}>
                     <td>{app.seekerProfile?.name}</td>
                     <td>{app.jobTitle}</td>
@@ -184,7 +184,7 @@ export default function EmployerDashboard() {
                           </Link>
                       </td>
                 </tr>
-              ))} */}
+              ))} 
 
               </tbody>
             </table>
