@@ -157,7 +157,7 @@ export default function JobSeekerDashboard() {
                 {!loadingApps && applications.map(app => (
                   <tr key={app.id}>
                     <td>
-                      <Link to={app.jobId ? `/jobs/${app.jobId}?from=seeker` : '/jobs'} style={{ fontWeight: 500 }}>
+                       <Link to={app.id ? `/application/${app.id}` : '/dashboard/seeker'} style={{ fontWeight: 500 }}>
                         {app.jobTitle}
                       </Link>
                     </td>

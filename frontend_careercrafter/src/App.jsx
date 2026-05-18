@@ -9,6 +9,9 @@ import JobSearch from "./pages/job/JobSearch"
 import JobDetails from "./pages/job/JobDetails"
 import { ProfileProvider } from "./contexts/ProfileContext"
 import JobApplication from "./pages/jobApplication/JobApplication"
+import ApplicantProfile from "./pages/jobApplication/ApplicantProfile"
+import JobSeekerProfileView from "./pages/jobApplication/JobSeekerProfileView"
+import ApplicationStatus from "./pages/jobApplication/ApplicationStatus"
 
 
 function App() {
@@ -25,6 +28,9 @@ function App() {
         <Route path="/jobs" element={<JobSearch />} />
         <Route path="/jobs/:id" element={<JobDetails/>} />
         <Route path="/jobs/apply/:id" element={<JobApplication />} />
+        <Route path="/applicant/:id" element={<ApplicantProfile />} />
+        <Route path="/job-seeker/:id" element={<JobSeekerProfileView />} />
+        <Route path="/application/:id" element={<ApplicationStatus />} />
       </Routes>
     </ProfileProvider>
   )

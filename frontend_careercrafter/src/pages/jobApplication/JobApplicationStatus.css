@@ -1,0 +1,108 @@
+.app-status-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.status-card {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  box-shadow: var(--shadow);
+  margin-bottom: 32px;
+}
+
+.status-header {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 24px;
+  margin-bottom: 24px;
+}
+
+.status-job-title {
+  font-size: 1.8rem;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.status-company {
+  font-size: 1.1rem;
+  color: var(--primary);
+  font-weight: 500;
+}
+
+.status-meta {
+  margin-top: 16px;
+  display: flex;
+  gap: 24px;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+/* Timeline */
+.timeline {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  padding-left: 32px;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 11px;
+  width: 2px;
+  background: var(--border);
+}
+
+.timeline-step {
+  position: relative;
+  margin-bottom: 32px;
+}
+
+.timeline-step:last-child {
+  margin-bottom: 0;
+}
+
+.step-marker {
+  position: absolute;
+  left: -32px;
+  top: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 4px solid var(--border);
+  z-index: 1;
+}
+
+.timeline-step.completed .step-marker {
+  border-color: var(--success);
+  background: var(--success);
+}
+
+.timeline-step.rejected .step-marker {
+  border-color: var(--danger);
+  background: var(--danger);
+}
+
+.timeline-step.active .step-marker {
+  border-color: var(--primary);
+  background: var(--surface);
+}
+
+.step-content {
+  padding-left: 16px;
+}
+
+.step-title {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.step-desc {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+}
