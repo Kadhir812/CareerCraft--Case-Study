@@ -6,7 +6,7 @@ import ParticleBackground from '../../components/ParticleBackground'
 import { loginApi } from '../../api/authApi'
 import './AuthPage.css'
 
-const ALLOWED_ROLES = ['EMPLOYER', 'SEEKER']
+const ALLOWED_ROLES = ['EMPLOYER', 'JOB_SEEKER']
 
 const validateEmail = (email) =>
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
