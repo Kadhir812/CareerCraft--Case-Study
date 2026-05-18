@@ -89,7 +89,7 @@ export default function JobSeekerDashboard() {
     loadJobs()
   }, [])
 
-  const greetingName = useMemo(() => {
+  const greetingName = useMemo(() => { //use memo
     if (fullName) return fullName
     const email = profile?.email || localStorage.getItem('email') || ''
     return email.split('@')[0] || 'there'
