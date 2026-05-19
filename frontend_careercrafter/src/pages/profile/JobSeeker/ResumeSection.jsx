@@ -11,6 +11,13 @@ const ResumeSection = ({
   deleteResume,
   setDefaultResume
 }) => {
+    const openResume = resume => {
+        if (!resume?.fileUrl) {
+            return
+        }
+
+        window.open(resume.fileUrl, '_blank', 'noopener,noreferrer')
+    }
 
 
   return (
@@ -82,6 +89,17 @@ const ResumeSection = ({
                 </div>
 
                 <div>Type: {r.fileType}</div>
+
+                <div style={{ marginTop: 8 }}>
+                    <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={!r.fileUrl}
+                    onClick={() => openResume(r)}
+                    >
+                    Open Resume
+                    </Button>
+                </div>
 
                 <div>
                     Visibility:

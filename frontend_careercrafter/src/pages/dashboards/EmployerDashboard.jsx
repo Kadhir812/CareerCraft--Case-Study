@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
@@ -47,18 +47,20 @@ export default function EmployerDashboard() {
     try {
       if (jobs.length === 0) return
 
-      const allApps = await Promise.all(
+      const allApps = await Promise.all( //Promise.all() runs all requests in parallel i.e get all job.id parallely
         jobs.map(job => getApplicationsForJob(job.id))
       )
 
       const merged = allApps.flatMap(extractApplicationList)
       const countByJobId = merged.reduce((acc, app) => {
-        const jobId = app?.jobId ?? app?.job?.id
-        if (jobId != null) {
-          acc[jobId] = (acc[jobId] || 0) + 1
-        }
-        return acc
-      }, {})
+          const jobId = app?.jobId ?? app?.job?.id
+
+          if (jobId != null) {
+            acc[jobId] = (acc[jobId] || 0) + 1
+          }
+
+          return acc
+        }, {})
 
       merged.sort((a, b) => new Date(b.appliedDate) - new Date(a.appliedDate))
 
@@ -75,26 +77,41 @@ export default function EmployerDashboard() {
   loadApplicants()
 }, [jobs])
 
-  const employerJobs = useMemo(() => jobs, [jobs])
-  async function handleSaveJob(jobData) {
-    try {
-      setActionBusy(true)
-      if (editingJob) {
-        const updated = await updateJobApi(editingJob.id, jobData)
-        setJobs(prev => prev.map(j => j.id === editingJob.id ? { ...j, ...updated } : j))
-        setEditingJob(null)
-      } else {
-        const created = await createJobApi(jobData)
-        setJobs(prev => [created, ...prev])
-        setShowJobPost(false)
-      }
-      setError('')
-    } catch (err) {
-      setError(err?.response?.data?.message || 'Unable to save job')
-    } finally {
-      setActionBusy(false)
+ const employerJobs = jobs
+
+async function handleSaveJob(jobData) {
+  try {
+    setActionBusy(true)
+    if (editingJob) {
+      const updated = await updateJobApi(editingJob.id, jobData)
+
+      setJobs(prev =>
+        prev.map(j =>
+          j.id === editingJob.id
+            ? { ...j, ...updated }
+            : j
+        )
+      )
+
+      setEditingJob(null)
+    } else {
+      const created = await createJobApi(jobData)
+
+      setJobs(prev => [created, ...prev])
+
+      setShowJobPost(false)
     }
+
+    setError('')
+  } catch (err) {
+    setError(
+      err?.response?.data?.message ||
+      'Unable to save job'
+    )
+  } finally {
+    setActionBusy(false)
   }
+}
 
   return (
     <div className="page-wrapper">
