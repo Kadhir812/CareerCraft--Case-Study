@@ -8,6 +8,14 @@ import { getApplicationsForJob } from '../../api/applicationApi'
 import './Dashboard.css'
 import JobPost from '../job/JobPost'
 
+function extractApplicationList(response) {
+  const data = response?.data
+  if (Array.isArray(data)) return data
+  if (Array.isArray(data?.content)) return data.content
+  if (Array.isArray(data?.applications)) return data.applications
+  return []
+}
+
 export default function EmployerDashboard() {
   const [showJobPost, setShowJobPost] = useState(false)
   const [editingJob, setEditingJob] = useState(null)
@@ -39,18 +47,26 @@ export default function EmployerDashboard() {
     try {
       if (jobs.length === 0) return
 
-    
       const allApps = await Promise.all(
         jobs.map(job => getApplicationsForJob(job.id))
       )
 
-      // flatten array
-      const merged = allApps.flatMap(res => res.data)
+      const merged = allApps.flatMap(extractApplicationList)
+      const countByJobId = merged.reduce((acc, app) => {
+        const jobId = app?.jobId ?? app?.job?.id
+        if (jobId != null) {
+          acc[jobId] = (acc[jobId] || 0) + 1
+        }
+        return acc
+      }, {})
 
-      // sort latest first
       merged.sort((a, b) => new Date(b.appliedDate) - new Date(a.appliedDate))
 
       setRecentApplicants(merged)
+      setJobs(prev => prev.map(job => ({
+        ...job,
+        applicants: countByJobId[job.id] || 0,
+      })))
     } catch (err) {
       console.error('Failed to load applicants', err)
     }
@@ -132,7 +148,7 @@ export default function EmployerDashboard() {
                   <span className={`badge badge-${job.status === 'ACTIVE' ? 'green' : 'red'}`}>{job.status}</span>
                 </div>
                 <div className="pjc-meta">
-                  <span> {job.applicants} applicants</span>
+                  <span>{job.applicants || 0} applicants</span>
                   <span> Posted: {job.postedDate ? new Date(job.postedDate).toLocaleDateString() : 'N/A'}</span>
                 </div>
                 <div className="pjc-meta">

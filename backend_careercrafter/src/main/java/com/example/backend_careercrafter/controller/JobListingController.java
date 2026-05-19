@@ -64,7 +64,7 @@ public class JobListingController {
             @RequestParam(required = false) String location,
             @RequestParam(required = false) JobType type,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "5") int size) {
         Page<JobListingResponse> response = jobListingService.searchJobs(query, location, type, page, size);
         return ResponseEntity.ok(response);
     }

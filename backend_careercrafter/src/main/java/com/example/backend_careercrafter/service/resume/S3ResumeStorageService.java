@@ -35,8 +35,8 @@ public class S3ResumeStorageService {
     public void upload(String objectKey, MultipartFile file) throws IOException {
         PutObjectRequest putRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
-                .key(objectKey)
-                .contentType(file.getContentType())
+                .key(objectKey) //path where resume stores in s3
+                .contentType(file.getContentType())//file type like word,pdf,xlsx
                 .build();
 
         s3Client.putObject(putRequest, RequestBody.fromInputStream(file.getInputStream(), file.getSize()));

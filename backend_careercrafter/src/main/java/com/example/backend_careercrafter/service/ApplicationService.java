@@ -59,13 +59,14 @@ public class ApplicationService {
         app.setStatus(Status.APPLIED);
         app.setAppliedDate(LocalDateTime.now());
         app.setCoverLetter(dto.getCoverLetter());
+
         if (dto.getExperienceLevel() != null) {
             app.setExperienceLevel(dto.getExperienceLevel());
         } else {
             throw new IllegalArgumentException("Experience level is required");
         }
         app.setPortfolioUrl(dto.getPortfolioUrl());
-        // Attach resume if provided
+        
         if (dto.getResumeId() != null) {
             Resume resume = resumeRepository.findById(dto.getResumeId())
                     .orElseThrow(() -> new EntityNotFoundException("Resume not found: " + dto.getResumeId()));
@@ -92,7 +93,9 @@ public class ApplicationService {
         JobSeeker seeker = jobSeekerRepository.findByUserEmail(seekerEmail)
                 .orElseThrow(() -> new EntityNotFoundException("Seeker not found for email: " + seekerEmail));
         List<Application> apps = applicationRepository.findBySeekerId(seeker.getId());
-        return apps.stream().map(this::toResponseDTO).collect(Collectors.toList());
+        return apps.stream()
+                    .map(this::toResponseDTO)
+                    .collect(Collectors.toList());
     }
 
     public List<ApplicationResponseDTO> getApplicationsForJob(String employerEmail, Long jobId) {

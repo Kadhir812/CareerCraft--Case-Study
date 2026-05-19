@@ -40,7 +40,7 @@ public class SkillService {
         JobSeeker jobSeeker = jobSeekerRepository.findByUserEmail(username)
                 .orElseThrow(() -> new IllegalArgumentException("JobSeeker not found for user: " + username));
         return seekerSkillRepository.findByJobSeeker(jobSeeker)
-                .stream()
+                .stream() // Processes collection one-by-oneeeeeeeeee
                 .map(seekerSkill -> new SkillResponse(seekerSkill.getId(), seekerSkill.getSkill().getSkillName()))
                 .collect(Collectors.toList());
     }
@@ -50,7 +50,8 @@ public class SkillService {
                 .orElseThrow(() -> new IllegalArgumentException("JobSeeker not found for user: " + username));
         SeekerSkill seekerSkill = seekerSkillRepository.findById(skillId)
                 .orElseThrow(() -> new IllegalArgumentException("Skill not found: " + skillId));
-        if (seekerSkill.getJobSeeker().getId() != jobSeeker.getId()) {
+        if (seekerSkill.getJobSeeker().getId() != jobSeeker.getId()) { //here it check s the ownership because user can
+                                                                       // delete only their own skill.
             throw new SecurityException("Unauthorized to delete this skill");
         }
         seekerSkillRepository.deleteById(skillId);

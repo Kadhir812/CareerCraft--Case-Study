@@ -40,7 +40,8 @@ public class EducationService {
         JobSeeker jobSeeker = jobSeekerRepository.findByUserEmail(username)
                 .orElseThrow(() -> new IllegalArgumentException("JobSeeker not found for user: " + username));
         return educationRepository.findAll().stream()
-                .filter(edu -> edu.getJobSeeker().equals(jobSeeker))
+                .filter(edu -> edu.getJobSeeker().equals(jobSeeker))// Keeps only education belonging to
+                                                                            // logged-in user.
                 .map(edu -> new EducationResponse(
                         edu.getId(),
                         edu.getInstitution(),

@@ -49,10 +49,12 @@ public class ResumeService {
                 }
             }
         }
+
+        //checking extension with only supported types
         String originalName = file.getOriginalFilename();
-        String ext = originalName != null && originalName.contains(".")
-                ? originalName.substring(originalName.lastIndexOf('.') + 1).toUpperCase()
-                : "";
+        String ext = originalName != null && originalName.contains(".")//extract the extension  
+                ? originalName.substring(originalName.lastIndexOf('.') + 1).toUpperCase() //pdf -> PDF
+                : "";//remember sliding window substring
         Resume.FileType fileType;
         try {
             fileType = Resume.FileType.valueOf(ext);
@@ -60,6 +62,9 @@ public class ResumeService {
             log.error("Invalid file type: {}. Only PDF, DOC, DOCX allowed.", ext);
             throw new IllegalArgumentException("Invalid file type. Only PDF, DOC, DOCX allowed.");
         }
+
+
+        //resume storing
         String objectName = "resumes/" + jobSeeker.getId() + "/" + UUID.randomUUID() + "." + ext.toLowerCase();
         try {
             s3ResumeStorageService.upload(objectName, file);
@@ -67,6 +72,9 @@ public class ResumeService {
             log.error("Failed to upload file to S3: {}", e.getMessage(), e);
             throw new RuntimeException("Failed to upload file to S3", e);
         }
+
+
+        //private or employee
         Resume.Visibility visibilityEnum;
         try {
             visibilityEnum = Resume.Visibility.valueOf(visibility.toUpperCase());
