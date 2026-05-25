@@ -12,7 +12,7 @@
           "token.actions.githubusercontent.com:aud":"sts.amazonaws.com"
         },
         "StringLike":{
-          "token.actions.githubusercontent.com:sub":"repo:kadhir812/CareerCraft--Case-Study:*"
+          "token.actions.githubusercontent.com:sub":"repo:Kadhir812/CareerCraft--Case-Study:*"
         }
       }
     }
