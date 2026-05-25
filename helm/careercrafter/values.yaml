@@ -1,0 +1,12 @@
+backend:
+  image:
+    repository: ACCOUNT_ID.dkr.ecr.ap-south-1.amazonaws.com/careercrafter-backend
+    tag: latest
+  serviceAccount:
+    name: backend-sa
+    roleArn: ""
+
+frontend:
+  image:
+    repository: ACCOUNT_ID.dkr.ecr.ap-south-1.amazonaws.com/careercrafter-frontend
+    tag: latest
