@@ -29,7 +29,7 @@ export default function JobPost({
 }) {
 
   const [form, setForm] = useState(
-    initialJob
+    initialJob //Conditional Form Initialization
         ? {
             ...initialJob,
             deadline: initialJob.deadline

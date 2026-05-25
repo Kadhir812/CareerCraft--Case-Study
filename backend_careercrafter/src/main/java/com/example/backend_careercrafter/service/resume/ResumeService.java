@@ -55,6 +55,7 @@ public class ResumeService {
         String ext = originalName != null && originalName.contains(".")//extract the extension  
                 ? originalName.substring(originalName.lastIndexOf('.') + 1).toUpperCase() //pdf -> PDF
                 : "";//remember sliding window substring
+                
         Resume.FileType fileType;
         try {
             fileType = Resume.FileType.valueOf(ext);

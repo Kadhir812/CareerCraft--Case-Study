@@ -79,10 +79,10 @@ export async function searchJobsApi({ query, location, type, page = 0, size = 20
   if (location?.trim()) params.location = location.trim()
   if (type) params.type = type
 
-  const { data } = await api.get('/jobs', { params })
+  const { data } = await api.get('/jobs', { params })//GET /jobs?page=0&size=20&query=React&location=NYC&type=FULL_TIME
   return {
     ...data,
-    content: (data?.content || []).map(toUiJob),
+    content: (data?.content || []).map(toUiJob),//optional chaining
   }
 }
 

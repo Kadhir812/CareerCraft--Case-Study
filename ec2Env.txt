@@ -1,3 +1,57 @@
+ubuntu@ip-172-31-13-136:~/Backend$ cat docker-compose.yml
+services:
+  backend:
+    image: ${ECR_REGISTRY}/careercrafter-backend:latest
+    container_name: careercrafter-backend
+    env_file:
+      - ./.env
+    expose:
+      - "8084"
+    restart: unless-stopped
+    networks:
+      - career-network
+
+  frontend:
+    image: ${ECR_REGISTRY}/careercrafter-frontend:latest
+    container_name: careercrafter-frontend
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+    restart: unless-stopped
+    networks:
+      - career-network
+
+networks:
+  career-network:
+    driver: bridge
+
+
+
+
+
+
+ubuntu@ip-172-31-13-136:~/Backend$ cat .env
+
+DB_URL=jdbc:mysql://ccdatabase.cba86w080orf.ap-southeast-2.rds.amazonaws.com:3306/careercrafter
+DB_USERNAME=admin
+DB_PASSWORD=Immunoglobin812
+
+JWT_SECRET=3d9a7b1c9d6e2f4a8c1b5d9e7a3f6c2b4e8d1a7c9f5b2e6d3a8c4f1b7e9d2b5
+JWT_EXPIRATION_MS=10800000
+
+
+AWS_REGION=ap-southeast-2
+S3_BUCKET=resumes-bucket-careercrafter
+AWS_ACCOUNT_ID=666607745270
+ECR_REGISTRY=666607745270.dkr.ecr.ap-southeast-2.amazonaws.com
+
+
+
+
+
+ci/ccdatabase
+
 name: CareerCrafter CI/CD
 
 on:
@@ -15,9 +69,12 @@ permissions:
 
 env:
   AWS_REGION: ${{ vars.AWS_REGION }}
-  AWS_ACCOUNT_ID: ${{ vars.AWS_ACCOUNT_ID }}
-  ECR_BACKEND_REPOSITORY: careercrafter-backend
-  ECR_FRONTEND_REPOSITORY: careercrafter-frontend
+  EC2_HOST: ${{ vars.EC2_HOST }}
+  EC2_USER: ${{ vars.EC2_USER }}
+  EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+  DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
+  DOCKERHUB_BACKEND_REPOSITORY: ${{ vars.DOCKERHUB_BACKEND_REPOSITORY }}
+  DOCKERHUB_FRONTEND_REPOSITORY: ${{ vars.DOCKERHUB_FRONTEND_REPOSITORY }}
 
 jobs:
   test-and-scan:
@@ -109,15 +166,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
         with:
-          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/GitHubECRRole
-          aws-region: ${{ env.AWS_REGION }}
-
-      - name: Login to ECR
-        id: ecr-login
-        uses: aws-actions/amazon-ecr-login@v2
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push backend image
         uses: docker/build-push-action@v6
@@ -126,8 +179,8 @@ jobs:
           file: ./backend_careercrafter/Dockerfile
           push: true
           tags: |
-            ${{ steps.ecr-login.outputs.registry }}/${{ env.ECR_BACKEND_REPOSITORY }}:${{github.run_id}}
-            ${{ steps.ecr-login.outputs.registry }}/${{ env.ECR_BACKEND_REPOSITORY }}:latest
+            ${{ env.DOCKERHUB_USERNAME }}/${{ env.DOCKERHUB_BACKEND_REPOSITORY }}:${{ github.sha }}
+            ${{ env.DOCKERHUB_USERNAME }}/${{ env.DOCKERHUB_BACKEND_REPOSITORY }}:latest
 
       - name: Build and push frontend image
         uses: docker/build-push-action@v6
@@ -138,7 +191,34 @@ jobs:
           build-args: |
             VITE_API_BASE_URL=/api/v1
           tags: |
-            ${{ steps.ecr-login.outputs.registry }}/${{ env.ECR_FRONTEND_REPOSITORY }}:${{github.run_id}}
-            ${{ steps.ecr-login.outputs.registry }}/${{ env.ECR_FRONTEND_REPOSITORY }}:latest
+            ${{ env.DOCKERHUB_USERNAME }}/${{ env.DOCKERHUB_FRONTEND_REPOSITORY }}:${{ github.sha }}
+            ${{ env.DOCKERHUB_USERNAME }}/${{ env.DOCKERHUB_FRONTEND_REPOSITORY }}:latest
 
-  
+  deploy-to-ec2:
+    needs: build-and-push-images
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          DOCKERHUB_USERNAME: ${{ env.DOCKERHUB_USERNAME }}
+          DOCKERHUB_BACKEND_REPOSITORY: ${{ env.DOCKERHUB_BACKEND_REPOSITORY }}
+          DOCKERHUB_FRONTEND_REPOSITORY: ${{ env.DOCKERHUB_FRONTEND_REPOSITORY }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        with:
+          host: ${{ env.EC2_HOST }}
+          username: ${{ env.EC2_USER }}
+          key: ${{ env.EC2_SSH_KEY }}
+          envs: DOCKERHUB_USERNAME,DOCKERHUB_BACKEND_REPOSITORY,DOCKERHUB_FRONTEND_REPOSITORY,DOCKERHUB_TOKEN
+          script_stop: true
+          script: |
+            set -e
+
+            echo "$DOCKERHUB_TOKEN" | docker login --username "$DOCKERHUB_USERNAME" --password-stdin
+
+            cd ~/Backend
+            sudo -n docker compose down --remove-orphans || true
+            sudo -n docker compose pull
+            sudo -n docker compose up -d --remove-orphans

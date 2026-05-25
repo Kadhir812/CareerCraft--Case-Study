@@ -14,10 +14,10 @@ import java.util.Optional;
 @Repository
 public interface ApplicationRepository extends JpaRepository<Application, Long> {
 
-    @Query("select case when count(a) > 0 then true else false end " +
-            "from Application a " +
-            "where a.job.id = :jobId and a.seeker.id = :seekerId")
-    boolean existsByJobIdAndSeekerId(Long jobId, Long seekerId);
+    // @Query("select case when count(a) > 0 then true else false end " +
+    //         "from Application a " +
+    //         "where a.job.id = :jobId and a.seeker.id = :seekerId")
+    // boolean existsByJobIdAndSeekerId(Long jobId, Long seekerId);
 
     @Query("select case when count(a) > 0 then true else false end " +
        "from Application a " +

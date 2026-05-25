@@ -26,18 +26,17 @@ const formatStatus = status =>
   status ||
   'Not available'
 
+
 const formatDate = value => {
   if (!value) return 'Not available'
-
   const date = new Date(value)
-
   return Number.isNaN(date.getTime())
     ? 'Not available'
     : date.toLocaleDateString()
 }
 
 export default function ApplicantProfile() {
-  const { id } = useParams()
+  const { id } = useParams() //gets id from route parameter and make component use that id
 
   const [application, setApplication] = useState(null)
   const [status, setStatus] = useState('')
@@ -67,14 +66,17 @@ export default function ApplicantProfile() {
     }
 
     loadApplication()
-  }, [id])
+  }, [id])//useParams gets ID -> useefct gets id and runs it
 
+
+  //optional chaining to safely access the url.
+  // without optional chaining url wont open(says cannot read property) and returns undefined without crash
   const applicant = application?.seekerProfile || {}
 
   const detailRows = [
     {
       label: 'Applied Date',
-      value: formatDate(application?.appliedDate),
+      value: formatDate(application?.appliedDate),//here one level optional chaining
     },
     {
       label: 'Experience Level',
@@ -90,7 +92,7 @@ export default function ApplicantProfile() {
       value: application?.resume?.url
         ? 'Open resume'
         : 'No resume attached',
-      href: application?.resume?.url,
+      href: application?.resume?.url,//here two level optional chaining
     },
   ]
 

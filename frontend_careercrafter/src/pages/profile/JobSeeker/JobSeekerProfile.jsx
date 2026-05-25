@@ -52,7 +52,7 @@ const initialEduForm = {
     companyName: '',
     companyWebsite: '',
     industry: '',
-    verifiedStatus: 'PENDING'
+   
   })
   const [isEditing, setIsEditing] = useState(false)
 
@@ -127,7 +127,7 @@ const initialEduForm = {
     loadResumeData()
   }, [])
 
-  const handleSkillChange = e =>
+  const handleSkillChange = (e) =>
     setSkillInput(e.target.value)
 
   async function handleAddSkill(e) {
@@ -560,7 +560,7 @@ async function handleResumeUpload() {
 
     clearResumeInput()
   }
-}
+} //useRef here used for accessing the hidden input element that opens the file picker(This PC)
 
   return (
     <div className="page-wrapper">

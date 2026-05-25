@@ -55,7 +55,7 @@ export default function JobSearch() {
   const [jobs, setJobs] = useState([])
   const [loading, setLoading] = useState(true)
 
-  const [searchParams] = useSearchParams()
+  const [searchParams] = useSearchParams()//used for role detection
 
 
   const [search, setSearch] = useState('')
@@ -76,7 +76,7 @@ export default function JobSearch() {
   const isEmployer =
     from === 'employer' ||
     (
-      from !== 'seeker' &&
+      from !== 'seeker' &&  
       storedRole === 'EMPLOYER'
     )
 

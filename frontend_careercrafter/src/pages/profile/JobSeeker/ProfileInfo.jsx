@@ -123,16 +123,6 @@ const ProfileInfo = ({
             />
         </div>
 
-        <div>
-            <label>Verification Status</label>
-
-            <input
-            type="text"
-            className="form-input"
-            value={profile.verifiedStatus}
-            disabled
-            />
-        </div>
         </div>
     </>
     )}

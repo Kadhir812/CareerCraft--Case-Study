@@ -69,7 +69,6 @@ import "../UserProfile.css"
         companyName: data.companyName || '',
         industry: data.industry || '',
         website: data.website || '',
-        verifiedStatus: data.verifiedStatus || prev.verifiedStatus,
         email: data.email || prev.email,
       }))
       setError('')
