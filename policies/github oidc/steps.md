@@ -18,9 +18,7 @@ aws iam list-open-id-connect-providers
 
 4.Step 3 — Create role
 
-aws iam create-role `
---role-name GitHubECRRole `
---assume-role-policy-document file://github-trust(ECR).json
+aws iam create-role --role-name GitHubECRRole --assume-role-policy-document file://github-trust(ECR).json
 
 
 
@@ -31,9 +29,7 @@ For your pipeline you are not only pushing to ECR. You will later create/update 
 
 Start with:
 
-aws iam attach-role-policy `
---role-name GitHubECRRole `
---policy-arn arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess
+aws iam attach-role-policy --role-name GitHubECRRole --policy-arn arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess
 
 and also:
 

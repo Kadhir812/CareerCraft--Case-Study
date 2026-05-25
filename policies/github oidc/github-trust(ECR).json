@@ -1,10 +1,10 @@
 {
-  "Version":"2012-10-17",
-  "Statement":[
+  "Version": "2012-10-17",
+  "Statement": [
     {
       "Effect":"Allow",
       "Principal":{
-        "Federated":"arn:aws:iam::<account_id>:oidc-provider/token.actions.githubusercontent.com"
+        "Federated":"arn:aws:iam::666607745270:oidc-provider/token.actions.githubusercontent.com"
       },
       "Action":"sts:AssumeRoleWithWebIdentity",
       "Condition":{
