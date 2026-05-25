@@ -1,12 +1,12 @@
 backend:
   image:
-    repository: ACCOUNT_ID.dkr.ecr.ap-south-1.amazonaws.com/careercrafter-backend
-    tag: latest
+    repository: 666607745270.dkr.ecr.ap-southeast-2.amazonaws.com/careercrafter-backend
+    tag: 48b85db3d0e022c7255dac6e3f67c41674297a46
   serviceAccount:
     name: backend-sa
     roleArn: ""
 
 frontend:
   image:
-    repository: ACCOUNT_ID.dkr.ecr.ap-south-1.amazonaws.com/careercrafter-frontend
-    tag: latest
+    repository: 666607745270.dkr.ecr.ap-southeast-2.amazonaws.com/careercrafter-frontend
+    tag: 48b85db3d0e022c7255dac6e3f67c41674297a46
