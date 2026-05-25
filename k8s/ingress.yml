@@ -15,8 +15,7 @@ spec:
   ingressClassName: alb
 
   rules:
-  - host: careercrafter.co.in
-    http:
+  - http:
       paths:
       - path: /swagger-ui
         pathType: Prefix
