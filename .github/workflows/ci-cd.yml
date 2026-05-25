@@ -11,7 +11,7 @@ on:
 
 permissions:
   id-token: write
-  contents: read
+  contents: write
 
 env:
   AWS_REGION: ${{ vars.AWS_REGION }}
@@ -126,8 +126,8 @@ jobs:
           file: ./backend_careercrafter/Dockerfile
           push: true
           tags: |
+            ${{ steps.ecr-login.outputs.registry }}/${{ env.ECR_BACKEND_REPOSITORY }}:${{ github.sha }}
             ${{ steps.ecr-login.outputs.registry }}/${{ env.ECR_BACKEND_REPOSITORY }}:${{github.run_id}}
-            ${{ steps.ecr-login.outputs.registry }}/${{ env.ECR_BACKEND_REPOSITORY }}:latest
 
       - name: Build and push frontend image
         uses: docker/build-push-action@v6
@@ -138,7 +138,38 @@ jobs:
           build-args: |
             VITE_API_BASE_URL=/api/v1
           tags: |
+            ${{ steps.ecr-login.outputs.registry }}/${{ env.ECR_FRONTEND_REPOSITORY }}:${{ github.sha }}
             ${{ steps.ecr-login.outputs.registry }}/${{ env.ECR_FRONTEND_REPOSITORY }}:${{github.run_id}}
-            ${{ steps.ecr-login.outputs.registry }}/${{ env.ECR_FRONTEND_REPOSITORY }}:latest
+
+  update-newtag-in-helm-chart:
+    needs: build-and-push-images
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Update Helm image values
+        run: |
+          sed -i "s|repository: .*careercrafter-backend|repository: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_BACKEND_REPOSITORY}|" \
+            helm/careercrafter/values.yaml
+
+          sed -i "s|repository: .*careercrafter-frontend|repository: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_FRONTEND_REPOSITORY}|" \
+            helm/careercrafter/values.yaml
+
+          sed -i "s/tag:.*/tag: ${{ github.sha }}/" \
+            helm/careercrafter/values.yaml
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name github-actions
+          git config --global user.email github-actions@github.com
+
+          git diff --quiet helm/careercrafter/values.yaml && exit 0
+
+          git add helm/careercrafter/values.yaml
+          git commit -m "Update Helm image tag [skip ci]"
+          git push
 
   

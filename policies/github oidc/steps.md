@@ -33,9 +33,7 @@ aws iam attach-role-policy --role-name GitHubECRRole --policy-arn arn:aws:iam::a
 
 and also:
 
-aws iam attach-role-policy `
---role-name GitHubECRRole `
---policy-arn arn:aws:iam::aws:policy/AmazonEKSClusterPolicy
+aws iam attach-role-policy --role-name GitHubECRRole --policy-arn arn:aws:iam::aws:policy/AmazonEKSClusterPolicy
 
 
 6.get arn which is used in pipeline
