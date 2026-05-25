@@ -4,7 +4,7 @@ backend:
     tag: 1a65a74fade698b2ebd9553bf5e27cfc8e50fa5b
   serviceAccount:
     name: backend-sa
-    roleArn: ""
+    roleArn: arn:aws:iam::666607745270:role/eksctl-careercrafter-cluster-addon-iamservice-Role1-LwyQ8MGwCw0S
 
 frontend:
   image:
