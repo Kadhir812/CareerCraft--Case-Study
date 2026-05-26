@@ -1,7 +1,7 @@
 backend:
   image:
     repository: 666607745270.dkr.ecr.ap-southeast-2.amazonaws.com/careercrafter-backend
-    tag: 033ac864059af4171000e935e0f6f2324c95ee43
+    tag: 884aee89a71e007d5c54feec3d902b83d1fe144f
   serviceAccount:
     name: backend-sa
     roleArn: arn:aws:iam::666607745270:role/eksctl-careercrafter-cluster-addon-iamservice-Role1-LwyQ8MGwCw0S
@@ -9,4 +9,4 @@ backend:
 frontend:
   image:
     repository: 666607745270.dkr.ecr.ap-southeast-2.amazonaws.com/careercrafter-frontend
-    tag: 033ac864059af4171000e935e0f6f2324c95ee43
+    tag: 884aee89a71e007d5c54feec3d902b83d1fe144f
