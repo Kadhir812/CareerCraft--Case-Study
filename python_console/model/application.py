@@ -1,3 +1,6 @@
+from utils.constants import STATUS_APPLIED
+
+
 class Application:
 
     def __init__(
@@ -7,7 +10,7 @@ class Application:
         user_id,
         resume_id,
         phone_number,
-        status="Applied"
+        status=STATUS_APPLIED
     ):
         self.application_id = application_id
         self.job_id = job_id
