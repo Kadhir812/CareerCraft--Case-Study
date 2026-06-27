@@ -5,7 +5,7 @@ from utils.logger import get_logger
 logger = get_logger(__name__)
 
 class ProfileRepository:
-    def save(self, profile: Profile):
+    def save(self, profile):
         try:
             query = """
                 INSERT INTO profiles (user_id, qualification, experience, skills)
@@ -24,7 +24,7 @@ class ProfileRepository:
             logger.exception("Error creating profile: user_id=%s", profile.user_id)
             print(f"Error creating profile: {e}")
 
-    def find_by_user_id(self, user_id: int) -> Profile | None:
+    def find_by_user_id(self, user_id):
         try:
             query = "SELECT * FROM profiles WHERE user_id = %s"
             with db_cursor(dictionary=True) as cursor:

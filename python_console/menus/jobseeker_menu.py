@@ -20,25 +20,27 @@ def jobseeker_menu(payload):
     logger.info("Jobseeker menu opened: user_id=%s", user_id)
     while True:
         print("1. Create Profile")
-        print("2. Upload Resume")
-        print("3. Search Jobs")
-        print("4. Apply Job")
-        print("5. View Applications")
-        print("6. Logout")
+        print("2. Show Profile")
+        print("3. Upload Resume")
+        print("4. Show Resumes")
+        print("5. Search Jobs")
+        print("6. Apply Job")
+        print("7. View Applications")
+        print("8. Logout")
         choice = input("Enter your choice: ").strip()
         logger.info("Jobseeker menu choice selected: user_id=%s choice=%s", user_id, choice)
         if choice == "1":
-            # Create Profile
+            # create profile
             try:
-                qualification = input("Enter your qualification (e.g., B.Sc Computer Science): ").strip()
+                qualification = input("Enter your qualification (like., B.Sc Computer Science): ").strip()
                 if not re.fullmatch(r"[A-Za-z\s\.]+", qualification):
-                    raise ValueError("Qualification must contain only letters, spaces, and periods.")
+                    raise ValueError("Qualification must contain only letters and spaces.")
+                
                 exp_input = input("Enter years of experience (integer): ").strip()
                 if not exp_input.isdigit():
                     raise ValueError("Experience must be an integer.")
-                    
                 experience = int(exp_input)
-
+              
                 skills_input = input("Enter skills (comma separated): ").strip()
                 skills = skills_input 
                 
@@ -52,10 +54,27 @@ def jobseeker_menu(payload):
                 print(f"Error creating profile: {e}")
 
         elif choice == "2":
+            try:
+                service = ProfileService()
+                profile = service.get_profile(user_id)
+                logger.info("Jobseeker viewed profile: user_id=%s found=%s", user_id, profile is not None)
+                if not profile:
+                    print("No profile found. Please create a profile first.")
+                else:
+                    print("\nYour Profile")
+                    print(f"Qualification : {profile.qualification}")
+                    print(f"Experience    : {profile.experience} years")
+                    print(f"Skills        : {profile.skills}")
+            except Exception as e:
+                logger.exception("Error showing profile: user_id=%s", user_id)
+                print(f"Error showing profile: {e}")
+
+        elif choice == "3":
            
             try:
                 resume_name = input("Resume Name: ").strip()
                 qualification = input("Qualification: ").strip()
+                
                 exp_input = input("Experience (years): ").strip()
                 if not exp_input.isdigit():
                     raise ValueError("Experience must be an integer.")
@@ -74,7 +93,25 @@ def jobseeker_menu(payload):
                 logger.exception("Error uploading resume: user_id=%s", user_id)
                 print(f"Error uploading resume: {e}")
 
-        elif choice == "3":
+        elif choice == "4":
+            try:
+                resume_service = ResumeService(user_id)
+                resumes = list(resume_service.list_resumes())
+                logger.info("Jobseeker viewed resumes: user_id=%s count=%s", user_id, len(resumes))
+                if not resumes:
+                    print("No resumes found.")
+                else:
+                    print("\nYour Resumes")
+                    for idx, resume in enumerate(resumes, start=1):
+                        print(f"\n{idx}. {resume.resume_name} (ID: {resume.resume_id})")
+                        print(f"Qualification : {resume.qualification}")
+                        print(f"Experience    : {resume.experience} years")
+                        print(f"Skills        : {resume.skills}")
+            except Exception as e:
+                logger.exception("Error showing resumes: user_id=%s", user_id)
+                print(f"Error showing resumes: {e}")
+
+        elif choice == "5":
             try:
                 repo = JobRepository()
                 jobs = repo.find_all()
@@ -107,7 +144,7 @@ def jobseeker_menu(payload):
                 logger.exception("Error searching jobs: user_id=%s", user_id)
                 print(f"Error searching jobs: {e}")
     
-        elif choice == "4":
+        elif choice == "6":
             try:
                 # Fetch and display all available jobs
                 repo = JobRepository()
@@ -141,7 +178,8 @@ def jobseeker_menu(payload):
                 sel = input("Enter number: ").strip()
                 if not sel.isdigit() or int(sel) < 1 or int(sel) > len(resumes):
                     raise ValueError("Invalid selection.")
-                chosen = resumes[int(sel) - 1]
+                chosen = resumes[int(sel) - 1] 
+                # python lists using 0-based indexing
 
                 
                 phone = input(f"Enter your {PHONE_NUMBER_LENGTH}-digit phone number: ").strip()
@@ -158,7 +196,7 @@ def jobseeker_menu(payload):
                 logger.exception("Error applying for job: user_id=%s", user_id)
                 print(f"Error during apply job: {e}")
 
-        elif choice == "5":
+        elif choice == "7":
             try:
                 app_service = ApplicationService()
                 apps = app_service.get_user_applications(user_id)
@@ -168,13 +206,19 @@ def jobseeker_menu(payload):
                 else:
                     print(f"{'Job Title':<30} {'Company':<20} {'Status':<12} {'Applied At':<20}")
                     for app in apps:
-                        applied = app.applied_at.strftime("%Y-%m-%d %H:%M") if hasattr(app.applied_at, "strftime") else str(app.applied_at)
-                        print(f"{app.job_title[:30]:<30} {str(app.company):<20} {app.status:<12} {applied:<20}")
+                        # hasattr(python-inbuilt method) checks whether object has an attribute
+                        if hasattr(app.applied_at, "strftime"):
+                            applied = app.applied_at.strftime("%Y-%m-%d %H:%M")
+                        else:
+                            applied = str(app.applied_at or "N/A")
+
+                        company = app.company or "N/A"
+                        print(f"{app.job_title[:30]:<30} {str(company):<20} {app.status:<12} {applied:<20}")
             except Exception as e:
                 logger.exception("Error viewing applications: user_id=%s", user_id)
                 print(f"Error viewing applications: {e}")
                 
-        elif choice == "6":
+        elif choice == "8":
             logger.info("Jobseeker logged out: user_id=%s", user_id)
             print("Logged out successfully.")
             break

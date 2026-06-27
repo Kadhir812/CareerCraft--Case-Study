@@ -22,7 +22,7 @@ def display_welcome_menu():
     """)
 
 
-def register_flow(auth_service: AuthService):
+def register_flow(auth_service):
     try:
         logger.info("Registration flow started")
         name = input("Enter your name: ").strip()
@@ -53,8 +53,7 @@ def register_flow(auth_service: AuthService):
         print(f"Registration error: {e}")
 
 
-def login_flow(auth_service: AuthService):
-    """Handle user login and return JWT payload if successful."""
+def login_flow(auth_service):
     try:
         logger.info("Login flow started")
         email = input("Enter your email: ").strip()
@@ -105,7 +104,7 @@ def main_menu():
                     print("Unknown role. Returning to main menu.")
         elif choice == "3":
             logger.info("Application exited from main menu")
-            print("Goodbye!")
+            print("bye!")
             break
         else:
             logger.warning("Invalid main menu selection: choice=%s", choice)

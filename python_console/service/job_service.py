@@ -8,11 +8,11 @@ from utils.logger import get_logger
 logger = get_logger(__name__)
 
 class JobService:
-    def __init__(self, employer_id: int):
+    def __init__(self, employer_id):
         self.employer_id = employer_id
         self.repo = JobRepository()
 
-    def _validate_job(self, dto: JobDTO) -> None:
+    def _validate_job(self, dto):
         if not dto.title or not dto.title.strip():
             logger.warning("Job validation failed: employer_id=%s reason=missing_title", self.employer_id)
             raise InvalidJobException("Title must be a non-empty string")
@@ -39,7 +39,7 @@ class JobService:
             raise InvalidJobException("At least one valid skill is required")
         dto.required_skills = cleaned
 
-    def post_job(self, dto: JobDTO) -> bool:
+    def post_job(self, dto):
         self._validate_job(dto)
         logger.info("Posting job: employer_id=%s title=%s location=%s", self.employer_id, dto.title, dto.location)
         job = Job(

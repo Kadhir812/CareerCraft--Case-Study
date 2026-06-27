@@ -1,7 +1,7 @@
 class Job:
-    def __init__(self, job_id: int | None, employer_id: int,
-                 title: str, description: str, location: str,
-                 salary: float, required_skills: str):
+    def __init__(self, job_id, employer_id,
+                 title, description, location,
+                 salary, required_skills):
         self.job_id = job_id
         self.employer_id = employer_id
         self.title = title

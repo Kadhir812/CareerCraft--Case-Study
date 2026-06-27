@@ -12,7 +12,7 @@ class ProfileService:
     def __init__(self):
         self.repo = ProfileRepository()
 
-    def _validate_profile_dto(self, profile_dto: ProfileDTO) -> None:
+    def _validate_profile_dto(self, profile_dto):
         if not isinstance(profile_dto.qualification, str) or not profile_dto.qualification.strip():
             logger.warning("Profile validation failed: reason=missing_qualification")
             raise InvalidProfileException("Qualification must be a non-empty string")
@@ -25,14 +25,14 @@ class ProfileService:
             logger.warning("Profile validation failed: reason=missing_skills")
             raise InvalidProfileException("Skills must be a non-empty string")
 
-       
-        cleaned = add_skills(*profile_dto.skills.split(','))
+        skills = profile_dto.skills
+        cleaned = add_skills(*skills.split(','))
         if not cleaned:
             logger.warning("Profile validation failed: reason=no_valid_skills")
             raise InvalidProfileException("Skills must contain at least one valid entry")
         profile_dto.skills = cleaned
 
-    def create_profile(self, profile_dto: ProfileDTO, user_id: int) -> bool:
+    def create_profile(self, profile_dto, user_id):
         self._validate_profile_dto(profile_dto)
         logger.info("Creating profile: user_id=%s", user_id)
 
@@ -46,3 +46,16 @@ class ProfileService:
         self.repo.save(profile)
         logger.info("Profile created: user_id=%s", user_id)
         return True
+
+    def get_profile(self, user_id):
+        profile = self.repo.find_by_user_id(user_id)
+        if not profile:
+            logger.info("Profile not found: user_id=%s", user_id)
+            return None
+
+        logger.info("Profile fetched: user_id=%s", user_id)
+        return ProfileDTO(
+            qualification=profile.qualification,
+            experience=profile.experience,
+            skills=profile.skills,
+        )

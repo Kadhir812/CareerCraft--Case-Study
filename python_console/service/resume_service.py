@@ -10,12 +10,12 @@ logger = get_logger(__name__)
 
 class ResumeService:
 
-    def __init__(self, user_id: int):
+    def __init__(self, user_id):
         self.repo = ResumeRepository()
         self.user_id = user_id
 
 
-    def _validate_resume(self, dto: ResumeDTO) -> None:
+    def _validate_resume(self, dto):
         if not dto.resume_name or not dto.resume_name.strip():
             logger.warning("Resume validation failed: user_id=%s reason=missing_resume_name", self.user_id)
             raise InvalidResumeException("Resume name cannot be empty.")
@@ -31,14 +31,16 @@ class ResumeService:
         if not isinstance(dto.skills, str) or not dto.skills.strip():
             logger.warning("Resume validation failed: user_id=%s reason=missing_skills", self.user_id)
             raise InvalidResumeException("Skills must be a non-empty string.")
-
-        cleaned = add_skills(*dto.skills.split(','))
+        
+        skills = dto.skills
+        cleaned = add_skills(*skills.split(','))
         if not cleaned:
             logger.warning("Resume validation failed: user_id=%s reason=no_valid_skills", self.user_id)
             raise InvalidResumeException("Skills must contain at least one valid entry")
         dto.skills = cleaned
 
-    def upload_resume(self, dto: ResumeDTO) -> bool:
+
+    def upload_resume(self, dto):
         self._validate_resume(dto)
         logger.info("Uploading resume: user_id=%s resume_name=%s", self.user_id, dto.resume_name)
 
@@ -59,3 +61,7 @@ class ResumeService:
         logger.info("Fetched resumes: user_id=%s count=%s", self.user_id, len(resumes))
         for resume in resumes:
             yield resume
+
+
+
+# instead of returning all resumes at once it returns one at a time.it is more memory efficient in large datasets 

@@ -5,7 +5,7 @@ from utils.logger import get_logger
 logger = get_logger(__name__)
 
 class ResumeRepository:
-    def save(self, resume: Resume):
+    def save(self, resume):
         try:
             query = """
                 INSERT INTO resumes (user_id, resume_name, qualification, experience, skills)
@@ -20,7 +20,7 @@ class ResumeRepository:
             logger.exception("Error saving resume: user_id=%s resume_name=%s", resume.user_id, resume.resume_name)
             raise
 
-    def find_by_user(self, user_id: int) -> list[Resume]:
+    def find_by_user(self, user_id):
         resumes = []
         try:
             query = "SELECT * FROM resumes WHERE user_id = %s"

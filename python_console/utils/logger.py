@@ -5,7 +5,7 @@ LOG_DIR = Path(__file__).resolve().parents[1] / "logs"
 LOG_FILE = LOG_DIR / "app.log"
 
 
-def get_logger(name: str) -> logging.Logger:
+def get_logger(name):
     LOG_DIR.mkdir(exist_ok=True)
 
     logger = logging.getLogger(name)

@@ -1,5 +1,5 @@
 class JobDTO:
-    def __init__(self, title: str, description: str, location: str, salary: float, required_skills: str):
+    def __init__(self, title, description, location, salary, required_skills):
         self.title = title
         self.description = description
         self.location = location

@@ -1,5 +1,6 @@
 from dto.login_dto import LoginDTO
 from dto.register_dto import RegisterDTO
+import bcrypt
 from exceptions.custom_exceptions import (
     AuthenticationFailedException,
     CompanyNameRequiredException,
@@ -20,20 +21,32 @@ class AuthService:
     def __init__(self):
         self.user_repo = UserRepository()
 
-    def register(self, dto: RegisterDTO):
+    def _hash_password(self, password):
+        password_bytes = password.encode("utf-8")
+        hashed = bcrypt.hashpw(password_bytes, bcrypt.gensalt())
+        return hashed.decode("utf-8")
+
+    def _verify_password(self, plain_password, hashed_password):
+        return bcrypt.checkpw(
+            plain_password.encode("utf-8"),
+            hashed_password.encode("utf-8"),
+        )
+
+    def register(self, dto):
         logger.info("Registering user: email=%s role=%s", dto.email, dto.role)
         validate_email(dto.email)
 
         if dto.role not in VALID_ROLES:
-            logger.warning("Registration rejected because role is invalid: email=%s role=%s", dto.email, dto.role)
+            logger.warning("Role is invalid: email=%s role=%s", dto.email, dto.role)
             raise InvalidRoleException()
 
         if dto.role == ROLE_EMPLOYER and not dto.company_name:
-            logger.warning("Registration rejected because company name is missing: email=%s", dto.email)
+            logger.warning("Company name is missing: email=%s", dto.email)
             raise CompanyNameRequiredException()
 
     # we explicitly pass none here so constructor assigns none for null values
-        user = User(None, dto.name, dto.email, dto.password, dto.role, dto.company_name)
+        hashed_password = self._hash_password(dto.password)
+        user = User(None, dto.name, dto.email, hashed_password, dto.role, dto.company_name)
         saved_user = self.user_repo.save(user)
         
         logger.info("User registered: user_id=%s role=%s", saved_user.user_id, saved_user.role)
@@ -41,7 +54,7 @@ class AuthService:
 
 
 
-    def login(self, dto: LoginDTO):
+    def login(self, dto):
         logger.info("Authenticating user: email=%s", dto.email)
         try:
             validate_email(dto.email)
@@ -50,12 +63,12 @@ class AuthService:
             raise AuthenticationFailedException()
 
         stored_user = self.user_repo.find_by_email(dto.email)
-        if not stored_user or stored_user.password != dto.password:
-            logger.warning("Login rejected because credentials are invalid: email=%s", dto.email)
+        if not stored_user or not self._verify_password(dto.password, stored_user.password):
+            logger.warning("Credentials are invalid: email=%s", dto.email)
             raise AuthenticationFailedException()
 
         if stored_user.role not in VALID_ROLES:
-            logger.warning("Login rejected because role is unauthorized: user_id=%s role=%s", stored_user.user_id, stored_user.role)
+            logger.warning("Role is unauthorized: user_id=%s role=%s", stored_user.user_id, stored_user.role)
             raise AuthenticationFailedException()
 
         token = JwtHandler.generate_token(stored_user)

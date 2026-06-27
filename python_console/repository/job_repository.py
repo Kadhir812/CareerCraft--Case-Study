@@ -5,7 +5,7 @@ from utils.logger import get_logger
 logger = get_logger(__name__)
 
 class JobRepository:
-    def save(self, job: Job) -> None:
+    def save(self, job):
         sql = """
         INSERT INTO jobs (employer_id, title, description, location, salary, required_skills)
         VALUES (%s, %s, %s, %s, %s, %s)
@@ -16,7 +16,7 @@ class JobRepository:
             cursor.execute(sql, params)
         logger.info("Job saved: employer_id=%s title=%s", job.employer_id, job.title)
 
-    def find_by_employer(self, employer_id: int) -> list[Job]:
+    def find_by_employer(self, employer_id):
         sql = "SELECT job_id, employer_id, title, description, location, salary, required_skills FROM jobs WHERE employer_id = %s"
         with db_cursor() as cursor:
             cursor.execute(sql, (employer_id,))
@@ -32,8 +32,7 @@ class JobRepository:
             required_skills=row[6]
         ) for row in rows]
 
-    def find_all(self) -> list[Job]:
-        """Return all job postings as Job model objects."""
+    def find_all(self):
         sql = "SELECT job_id, employer_id, title, description, location, salary, required_skills FROM jobs"
         with db_cursor() as cursor:
             cursor.execute(sql)

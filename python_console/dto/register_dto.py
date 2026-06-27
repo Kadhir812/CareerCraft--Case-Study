@@ -1,6 +1,6 @@
 class RegisterDTO:
 
-    def __init__(self, name: str, email: str, password: str, role: str, company_name: str | None = None):
+    def __init__(self, name, email, password, role, company_name=None):
         self.name = name
         self.email = email
         self.password = password

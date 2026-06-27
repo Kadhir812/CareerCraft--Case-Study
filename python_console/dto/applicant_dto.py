@@ -1,7 +1,7 @@
 class ApplicantDTO:
-    def __init__(self, application_id: int, job_id: int, job_title: str, resume_id: int, qualification: str,
-                 experience: int, skills: str, applicant_name: str, phone_number: str,
-                 status: str):
+    def __init__(self, application_id, job_id, job_title, resume_id, qualification,
+                 experience, skills, applicant_name, phone_number,
+                 status):
         self.application_id = application_id
         self.job_id = job_id
         self.job_title = job_title

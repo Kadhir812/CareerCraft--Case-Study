@@ -1,6 +1,5 @@
-# pyrefly: ignore [missing-import]
 import jwt
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from utils.logger import get_logger
 
 SECRET_KEY = "career_crafter_super_secret_key_2026_hexaware_project"
@@ -10,14 +9,15 @@ logger = get_logger(__name__)
 class JwtHandler:
     @staticmethod
     def generate_token(user):
+        issued_at = datetime.now(timezone.utc)
         payload = {
             "user_id": user.user_id,
             "name": user.name,
             "email": user.email,
             "role": user.role,
             "company_name": user.company_name,
-            "iat": datetime.utcnow(),
-            "exp": datetime.utcnow() + timedelta(hours=1),
+            "iat": issued_at,
+            "exp": issued_at + timedelta(hours=1),
         }
 
         token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
