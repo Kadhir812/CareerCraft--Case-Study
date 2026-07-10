@@ -24,7 +24,6 @@ def display_welcome_menu():
 
 def register_flow(auth_service):
     try:
-        logger.info("Registration flow started")
         name = input("Enter your name: ").strip()
         email = input("Enter your email: ").strip()
         validate_email(email)
@@ -55,7 +54,6 @@ def register_flow(auth_service):
 
 def login_flow(auth_service):
     try:
-        logger.info("Login flow started")
         email = input("Enter your email: ").strip()
         password = input("Enter your password: ").strip()
         
@@ -69,6 +67,8 @@ def login_flow(auth_service):
             payload = auth_service.validate(token)
             if payload:
                 logger.info("Login successful: user_id=%s role=%s email=%s", payload.get("user_id"), payload.get("role"), email)
+            else:
+                print("Token validation failed. It may be expired or invalid.")
             return payload
     
     except AuthenticationFailedException as af:
@@ -85,34 +85,21 @@ def main_menu():
     while True:
         display_welcome_menu()
         choice = input("Enter choice (1-3): ").strip()
-        logger.info("Main menu choice selected: choice=%s", choice)
         if choice == "1":
             register_flow(auth_service)
         elif choice == "2":
             payload = login_flow(auth_service)
             if payload:
-                print("You are now logged in. Token stored in memory.")
                 role = payload.get("role")
                 if role == ROLE_JOBSEEKER:
-                    logger.info("Routing user to jobseeker menu: user_id=%s", payload.get("user_id"))
                     jobseeker_menu(payload)
                 elif role == ROLE_EMPLOYER:
-                    logger.info("Routing user to employer menu: user_id=%s", payload.get("user_id"))
                     employer_menu(payload)
                 else:
                     logger.warning("Unknown role in token payload: role=%s", role)
                     print("Unknown role. Returning to main menu.")
         elif choice == "3":
-            logger.info("Application exited from main menu")
             print("bye!")
             break
         else:
-            logger.warning("Invalid main menu selection: choice=%s", choice)
             print("Invalid selection. Please try again.")
-
-# these are the logging levels provided by logger
-# DEBUG
-# INFO
-# WARNING
-# ERROR
-# CRITICAL

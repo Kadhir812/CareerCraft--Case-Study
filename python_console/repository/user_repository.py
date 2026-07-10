@@ -25,8 +25,7 @@ class UserRepository:
                 user.company_name
             )
 
-            # cursor is an object which sends sql commands to db and recieves data
-            with db_cursor(commit=True) as cursor: 
+            with db_cursor(commit=True) as cursor:
                 cursor.execute(query, values)
                 user.user_id = cursor.lastrowid
             logger.info("User saved: user_id=%s role=%s", user.user_id, user.role)
@@ -42,9 +41,7 @@ class UserRepository:
             cursor.execute(query, (email,))
             result = cursor.fetchone()
         if result:
-            logger.info("User found by email: user_id=%s email=%s", result['user_id'], email)
             return User(
-                # mapping a database row to a model object.
                 result['user_id'],
                 result['name'],
                 result['email'],
@@ -52,7 +49,6 @@ class UserRepository:
                 result['role'],
                 result.get('company_name')
             )
-        logger.info("No user found by email: email=%s", email)
         return None
 
 

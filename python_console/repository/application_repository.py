@@ -1,4 +1,3 @@
-from model.application import Application
 from utils.db_context import db_cursor
 from utils.logger import get_logger
 
@@ -16,7 +15,7 @@ class ApplicationRepository:
             status
         ) VALUES (%s, %s, %s, %s, %s)
         """
-        params = (
+        values = (
             application.job_id,
             application.user_id,
             application.resume_id,
@@ -24,7 +23,7 @@ class ApplicationRepository:
             application.status,
         )
         with db_cursor(commit=True) as cursor:
-            cursor.execute(sql, params)
+            cursor.execute(sql, values)
         logger.info("Application saved: user_id=%s job_id=%s resume_id=%s", application.user_id, application.job_id, application.resume_id)
 
     def find_by_user(self, user_id):
@@ -40,19 +39,18 @@ class ApplicationRepository:
         WHERE a.user_id = %s
         ORDER BY a.applied_at DESC
         """
-        with db_cursor() as cursor:
+        with db_cursor(dictionary=True) as cursor:
             cursor.execute(sql, (user_id,))
             rows = cursor.fetchall()
-        logger.info("Applications fetched by user: user_id=%s count=%s", user_id, len(rows))
-        
+
         result = []
-        for job_id, title, company, status, applied_at in rows:
+        for row in rows:
             result.append({
-                "job_id": job_id,
-                "job_title": title,
-                "company": company,
-                "status": status,
-                "applied_at": applied_at,
+                "job_id": row["job_id"],
+                "job_title": row["title"],
+                "company": row["company"],
+                "status": row["status"],
+                "applied_at": row["applied_at"],
             })
         return result
 
@@ -100,5 +98,4 @@ class ApplicationRepository:
         with db_cursor(dictionary=True) as cursor:
             cursor.execute(sql, (job_id,))
             rows = cursor.fetchall()
-        logger.info("Applications fetched by job: job_id=%s count=%s", job_id, len(rows))
         return rows

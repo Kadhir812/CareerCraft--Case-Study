@@ -7,17 +7,14 @@ from dto.resume_dto import ResumeDTO
 from service.resume_service import ResumeService
 
 import re
-from utils.constants import PHONE_NUMBER_LENGTH, ROLE_JOBSEEKER, VALID_JOB_SEARCH_FIELDS
-from utils.decorators import require_role
+from utils.constants import PHONE_NUMBER_LENGTH, VALID_JOB_SEARCH_FIELDS
 from utils.logger import get_logger
 
 logger = get_logger(__name__)
 
 
-@require_role(ROLE_JOBSEEKER)
 def jobseeker_menu(payload):
     user_id = payload.get("user_id")
-    logger.info("Jobseeker menu opened: user_id=%s", user_id)
     while True:
         print("1. Create Profile")
         print("2. Show Profile")
@@ -28,9 +25,7 @@ def jobseeker_menu(payload):
         print("7. View Applications")
         print("8. Logout")
         choice = input("Enter your choice: ").strip()
-        logger.info("Jobseeker menu choice selected: user_id=%s choice=%s", user_id, choice)
         if choice == "1":
-            # create profile
             try:
                 qualification = input("Enter your qualification (like., B.Sc Computer Science): ").strip()
                 if not re.fullmatch(r"[A-Za-z\s\.]+", qualification):
@@ -41,13 +36,12 @@ def jobseeker_menu(payload):
                     raise ValueError("Experience must be an integer.")
                 experience = int(exp_input)
               
-                skills_input = input("Enter skills (comma separated): ").strip()
-                skills = skills_input 
-                
+                skills = input("Enter skills (comma separated): ").strip()
+                 
                 profile_dto = ProfileDTO(qualification, experience, skills)
                 service = ProfileService()
                 service.create_profile(profile_dto, user_id)
-                logger.info("Profile created from jobseeker menu: user_id=%s", user_id)
+                logger.info("Profile created: user_id=%s", user_id)
                 print("Profile created successfully.")
             except Exception as e:
                 logger.exception("Error creating profile: user_id=%s", user_id)
@@ -57,9 +51,8 @@ def jobseeker_menu(payload):
             try:
                 service = ProfileService()
                 profile = service.get_profile(user_id)
-                logger.info("Jobseeker viewed profile: user_id=%s found=%s", user_id, profile is not None)
                 if not profile:
-                    print("No profile found. Please create a profile first.")
+                    print("No profile found.")
                 else:
                     print("\nYour Profile")
                     print(f"Qualification : {profile.qualification}")
@@ -81,9 +74,8 @@ def jobseeker_menu(payload):
                 
                 experience = int(exp_input)
 
-                skills_input = input("Enter skills (comma separated): ").strip()
-                skills = skills_input 
-                
+                skills = input("Enter skills (comma separated): ").strip()
+              
                 resume_dto = ResumeDTO(resume_name, qualification, experience, skills)
                 resume_service = ResumeService(user_id)
                 resume_service.upload_resume(resume_dto)
@@ -97,7 +89,6 @@ def jobseeker_menu(payload):
             try:
                 resume_service = ResumeService(user_id)
                 resumes = list(resume_service.list_resumes())
-                logger.info("Jobseeker viewed resumes: user_id=%s count=%s", user_id, len(resumes))
                 if not resumes:
                     print("No resumes found.")
                 else:
@@ -118,6 +109,10 @@ def jobseeker_menu(payload):
                 if not jobs:
                     print("No jobs available.")
                 else:
+                    print(f"{'Job ID':<8} {'Title':<30} {'Location':<20} {'Salary':<10}")
+                    for job in jobs:
+                        print(f"{job.job_id:<8} {job.title:<30} {job.location:<20} {job.salary:<10}")
+
                     field = input(f"Search by ({'/'.join(VALID_JOB_SEARCH_FIELDS)}): ").strip().lower()
                     query = input(f"Enter {field} keyword: ").strip().lower()
                     if field not in VALID_JOB_SEARCH_FIELDS:
@@ -133,10 +128,8 @@ def jobseeker_menu(payload):
                     filtered = sorted(filtered, key=lambda job: job.salary)
                     
                     if not filtered:
-                        logger.info("Job search returned no results: user_id=%s field=%s query=%s", user_id, field, query)
                         print("No matching jobs found.")
                     else:
-                        logger.info("Job search completed: user_id=%s field=%s query=%s count=%s", user_id, field, query, len(filtered))
                         print(f"{'Job ID':<8} {'Title':<30} {'Location':<20} {'Salary':<10}")
                         for job in filtered:
                             print(f"{job.job_id:<8} {job.title:<30} {job.location:<20} {job.salary:<10}")
@@ -146,7 +139,6 @@ def jobseeker_menu(payload):
     
         elif choice == "6":
             try:
-                # Fetch and display all available jobs
                 repo = JobRepository()
                 jobs = repo.find_all()
                 if not jobs:
@@ -164,7 +156,6 @@ def jobseeker_menu(payload):
                 if job_id not in job_ids:
                     raise ValueError("Job ID not found.")
                     
-                # List resumes for selection
                 resume_service = ResumeService(user_id)
                 resumes = list(resume_service.list_resumes())
                 if not resumes:
@@ -172,16 +163,14 @@ def jobseeker_menu(payload):
                     continue
                 print("Select a resume to apply with:")
                 
-                for idx, r in enumerate(resumes, start=1):
-                    print(f"{idx}. {r.resume_name} (ID: {r.resume_id})")
+                for res_num, r in enumerate(resumes, start=1):
+                    print(f"{res_num}. {r.resume_name} (ID: {r.resume_id})")
                     
                 sel = input("Enter number: ").strip()
                 if not sel.isdigit() or int(sel) < 1 or int(sel) > len(resumes):
                     raise ValueError("Invalid selection.")
-                chosen = resumes[int(sel) - 1] 
-                # python lists using 0-based indexing
+                chosen = resumes[int(sel) - 1]
 
-                
                 phone = input(f"Enter your {PHONE_NUMBER_LENGTH}-digit phone number: ").strip()
                 if not phone.isdigit() or len(phone) != PHONE_NUMBER_LENGTH:
                     raise ValueError(f"Phone number must be a {PHONE_NUMBER_LENGTH}-digit numeric string.")
@@ -200,18 +189,12 @@ def jobseeker_menu(payload):
             try:
                 app_service = ApplicationService()
                 apps = app_service.get_user_applications(user_id)
-                logger.info("Jobseeker viewed applications: user_id=%s count=%s", user_id, len(apps))
                 if not apps:
                     print("No applications found.")
                 else:
                     print(f"{'Job Title':<30} {'Company':<20} {'Status':<12} {'Applied At':<20}")
                     for app in apps:
-                        # hasattr(python-inbuilt method) checks whether object has an attribute
-                        if hasattr(app.applied_at, "strftime"):
-                            applied = app.applied_at.strftime("%Y-%m-%d %H:%M")
-                        else:
-                            applied = str(app.applied_at or "N/A")
-
+                        applied = app.applied_at.strftime("%Y-%m-%d %H:%M")
                         company = app.company or "N/A"
                         print(f"{app.job_title[:30]:<30} {str(company):<20} {app.status:<12} {applied:<20}")
             except Exception as e:
@@ -219,9 +202,7 @@ def jobseeker_menu(payload):
                 print(f"Error viewing applications: {e}")
                 
         elif choice == "8":
-            logger.info("Jobseeker logged out: user_id=%s", user_id)
             print("Logged out successfully.")
             break
         else:
-            logger.warning("Invalid jobseeker menu choice: user_id=%s choice=%s", user_id, choice)
             print("Invalid choice. Please try again.")

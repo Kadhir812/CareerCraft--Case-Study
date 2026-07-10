@@ -1,27 +1,24 @@
 from service.application_service import ApplicationService
 from service.job_service import JobService
 from dto.job_dto import JobDTO
-from utils.constants import APPLICATION_STATUS_BY_INPUT, ROLE_EMPLOYER
-from utils.decorators import require_role
+from utils.constants import APPLICATION_STATUS_BY_INPUT
 from utils.logger import get_logger
 
 logger = get_logger(__name__)
 
 
-@require_role(ROLE_EMPLOYER)
 def employer_menu(payload):
     user_id = payload.get("user_id")
-    logger.info("Employer menu opened: user_id=%s", user_id)
     while True:
         print("\n--- Employer Menu ---")
         print("1. Post a job")
         print("2. View my jobs")
         print("3. View applications for my jobs")
         print("4. Update Application Status")
-        print("5. Logout")
+        print("5. Delete job by ID")
+        print("6. Logout")
 
         choice = input("Enter your choice: ").strip()
-        logger.info("Employer menu choice selected: user_id=%s choice=%s", user_id, choice)
 
         if choice == '1':
             try:
@@ -35,6 +32,7 @@ def employer_menu(payload):
                 job_dto = JobDTO(title, description, location, salary, skills_input)
                 job_service = JobService(user_id)
                 job_service.post_job(job_dto)
+                
                 logger.info("Employer posted job: user_id=%s title=%s location=%s", user_id, title, location)
                 print("Job posted successfully.")
             except Exception as e:
@@ -45,7 +43,6 @@ def employer_menu(payload):
             try:
                 job_service = JobService(user_id)
                 jobs = list(job_service.get_my_jobs())
-                logger.info("Employer viewed jobs: user_id=%s count=%s", user_id, len(jobs))
                 if not jobs:
                     print("You have not posted any jobs yet.")
                 else:
@@ -55,10 +52,9 @@ def employer_menu(payload):
             except Exception as e:
                 logger.exception("Error retrieving employer jobs: user_id=%s", user_id)
                 print(f"Error retrieving jobs: {e}")
-                
+
         elif choice == '3':
             try:
-                # Retrieve employer's posted jobs
                 job_service = JobService(user_id)
                 jobs = list(job_service.get_my_jobs())
                 if not jobs:
@@ -72,10 +68,9 @@ def employer_menu(payload):
                         if not applicants:
                             continue
                         print(f"\nApplicants for Job ID {job.job_id} - {job.title}:")
-                        print(f"{'Application ID':<15} {'Job Title':<30} {'Resume ID':<10} {'Qualification':<50} {'Experience':<10} {'Skills':<20} {'Applicant':<20} {'Phone':<12} {'Status':<12}")
+                        print(f"{'App ID':<8} {'Resume ID':<10} {'Qualification':<20} {'Experience':<10} {'Skills':<20} {'Applicant':<15} {'Phone':<12} {'Status':<10}")
                         for app in applicants:
-                            print(f"{app.application_id:<15} {app.job_title[:30]:<30} {app.resume_id:<10} {app.qualification[:50]:<50} {app.experience:<10} {app.skills[:20]:<20} {app.applicant_name[:20]:<20} {app.phone_number:<12} {app.status:<12}")
-                    logger.info("Employer viewed applicants: user_id=%s jobs=%s applicants=%s", user_id, len(jobs), total_applicants)
+                            print(f"{app.application_id:<8} {app.resume_id:<10} {app.qualification[:20]:<20} {app.experience:<10} {app.skills[:20]:<20} {app.applicant_name[:15]:<15} {app.phone_number:<12} {app.status:<10}")
             except Exception as e:
                 logger.exception("Error viewing applicants: user_id=%s", user_id)
                 print(f"Error viewing applicants: {e}")
@@ -98,7 +93,6 @@ def employer_menu(payload):
                         logger.warning("Application status update failed: user_id=%s application_id=%s status=%s", user_id, app_id, new_status)
                         print("Failed to update application status.")
             except ValueError:
-                logger.warning("Invalid application status update input: user_id=%s input=%s", user_id, app_id_input)
                 print("Invalid input. Application ID must be an integer.")
             except Exception as e:
                 logger.exception("Error updating application status from employer menu: user_id=%s", user_id)
@@ -106,9 +100,24 @@ def employer_menu(payload):
 
 
         elif choice == '5':
-            logger.info("Employer logged out: user_id=%s", user_id)
+            job_id_input = ""
+            try:
+                job_id_input = input("Job ID to delete: ").strip()
+                job_id = int(job_id_input)
+                job_service = JobService(user_id)
+                deleted = job_service.delete_job(job_id, payload=payload)
+                if deleted:
+                    print("Job deleted successfully.")
+                else:
+                    print("Job not found.")
+            except ValueError:
+                print("Invalid input. Job ID must be an integer.")
+            except Exception as e:
+                logger.exception("Error deleting job from employer menu: user_id=%s", user_id)
+                print(f"Error deleting job: {e}")
+
+        elif choice == '6':
             print("Logged out successfully.")
             break
         else:
-            logger.warning("Invalid employer menu choice: user_id=%s choice=%s", user_id, choice)
             print("Invalid choice. Please try again.")

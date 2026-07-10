@@ -28,7 +28,6 @@ class ResumeRepository:
                 cursor.execute(query, (user_id,))
                 for row in cursor.fetchall():
                     resumes.append(Resume(**row))
-            logger.info("Resumes fetched by user: user_id=%s count=%s", user_id, len(resumes))
         except Exception:
             logger.exception("Error fetching resumes: user_id=%s", user_id)
             raise

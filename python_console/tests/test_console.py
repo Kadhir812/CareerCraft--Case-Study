@@ -28,6 +28,7 @@ def test_register_dto_sets_values(register_values):
     assert dto.company_name == register_values["company_name"]
 
 
+
 @pytest.mark.parametrize(
     "email,password,expected_email,expected_password",
     [
@@ -40,6 +41,7 @@ def test_login_dto_sets_values(email, password, expected_email, expected_passwor
 
     assert dto.email == expected_email
     assert dto.password == expected_password
+
 
 
 @pytest.mark.parametrize(
@@ -58,6 +60,8 @@ def test_user_sets_values(user_id, name, email, password, role, company_name, ex
     assert user.password == password
     assert user.role == role
     assert user.company_name == company_name
+
+
 
 
 @pytest.mark.parametrize(

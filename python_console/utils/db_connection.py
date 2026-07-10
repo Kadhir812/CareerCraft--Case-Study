@@ -9,18 +9,11 @@ def get_connection():
         conn = mysql.connector.connect(
             host="localhost",
             user="root",
-            password="Immunoglobin@812",
+            password="",
             database="careercrafter"
         )
-        logger.info("Database connection opened with primary credentials")
         return conn
-    except mysql.connector.Error:
-        logger.warning("Primary database credentials failed; trying fallback credentials")
-        conn = mysql.connector.connect(
-            host="localhost",
-            user="root",
-            password="root",
-            database="careercrafter"
-        )
-        logger.info("Database connection opened with fallback credentials")
-        return conn
+    except mysql.connector.Error as e:
+        logger.exception("Database connection failed")
+        print(e)
+        raise

@@ -31,7 +31,6 @@ class ProfileRepository:
                 cursor.execute(query, (user_id,))
                 result = cursor.fetchone()
             if result:
-                logger.info("Profile found by user: user_id=%s", user_id)
                 return Profile(
                     result["profile_id"],
                     result["user_id"],
@@ -39,7 +38,6 @@ class ProfileRepository:
                     result["experience"],
                     result["skills"],
                 )
-            logger.info("No profile found by user: user_id=%s", user_id)
             return None
         except Exception as e:
             logger.exception("Error fetching profile: user_id=%s", user_id)

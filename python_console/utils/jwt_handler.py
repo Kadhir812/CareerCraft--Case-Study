@@ -10,14 +10,11 @@ class JwtHandler:
     @staticmethod
     def generate_token(user):
         issued_at = datetime.now(timezone.utc)
+        expires_at = issued_at + timedelta(hours=1)
         payload = {
             "user_id": user.user_id,
-            "name": user.name,
-            "email": user.email,
             "role": user.role,
-            "company_name": user.company_name,
-            "iat": issued_at,
-            "exp": issued_at + timedelta(hours=1),
+            "exp": int(expires_at.timestamp()),
         }
 
         token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
@@ -32,9 +29,7 @@ class JwtHandler:
             return payload
         except jwt.ExpiredSignatureError:
             logger.warning("JWT token expired")
-            print("Token Expired")
         except jwt.InvalidTokenError:
             logger.warning("JWT token invalid")
-            print("Invalid Token")
 
         return None
